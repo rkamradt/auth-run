@@ -1,0 +1,39 @@
+version: "2"
+services:
+  api:
+    image: nginx:alpine
+    networks:
+      - network
+    volumes:
+     - ./nginx.conf:/etc/nginx/nginx.conf
+     - ~/.secret:/etc/certs
+    ports:
+     - "443:443"
+  oauth2:
+    image: rlkamradt/oauth2service
+    env_file:
+      - ~/.secrets/auth.env
+    networks:
+      - network
+  idapi:
+    image: rlkamradt/useridservice
+    env_file:
+      - ~/.secrets/auth.env
+    networks:
+      - network
+  intidapi:
+    image: rlkamradt/useridservice
+    env_file:
+      - ~/.secrets/auth.env
+    environment:
+      - NO_AUTH=true
+    ports:
+      - "3001:3000"
+    networks:
+      - network
+  redis:
+    image: redis:alpine
+    networks:
+      - network
+networks:
+  network:
